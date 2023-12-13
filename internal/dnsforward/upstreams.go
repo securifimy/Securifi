@@ -20,10 +20,6 @@ import (
 )
 
 const (
-	// errNotDomainSpecific is returned when the upstream should be
-	// domain-specific, but isn't.
-	errNotDomainSpecific errors.Error = "not a domain-specific upstream"
-
 	// errMissingSeparator is returned when the domain-specific part of the
 	// upstream configuration line isn't closed.
 	errMissingSeparator errors.Error = "missing separator"

@@ -5,6 +5,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/AdguardTeam/dnsproxy/proxy"
 	"github.com/AdguardTeam/dnsproxy/upstream"
 	"github.com/AdguardTeam/golibs/errors"
 	"github.com/AdguardTeam/golibs/log"
@@ -63,49 +64,88 @@ func newUpstreamConfigValidator(
 ) (cv *upstreamConfigValidator) {
 	cv = &upstreamConfigValidator{}
 
-	for _, line := range general {
-		cv.general = cv.insertLineResults(cv.general, line, opts)
-	}
-	for _, line := range fallback {
-		cv.fallback = cv.insertLineResults(cv.fallback, line, opts)
-	}
-	for _, line := range private {
-		cv.private = cv.insertLineResults(cv.private, line, opts)
-	}
+	cv.general = cv.insertLinesResults(cv.general, general, opts)
+	cv.fallback = cv.insertLinesResults(cv.fallback, fallback, opts)
+	cv.private = cv.insertLinesResults(cv.private, private, opts)
 
 	return cv
 }
 
-// insertLineResults parses line and inserts the result into s.  It can insert
+// insertLinesResults parses lines and inserts the result into s.  It can insert
 // multiple results as well as none.
-func (cv *upstreamConfigValidator) insertLineResults(
+func (cv *upstreamConfigValidator) insertLinesResults(
 	s []*upstreamResult,
-	line string,
+	lines []string,
 	opts *upstream.Options,
 ) (result []*upstreamResult) {
-	upstreams, isSpecific, err := splitUpstreamLine(line)
+	conf, err := proxy.ParseUpstreamsConfig(lines, opts)
 	if err != nil {
-		return cv.insert(s, &upstreamResult{
-			err:      err,
-			original: line,
-		})
+		s = cv.insertErrResults(s, err)
 	}
 
-	for _, upstreamAddr := range upstreams {
-		var res *upstreamResult
-		if upstreamAddr != "#" {
-			res = cv.parseUpstream(upstreamAddr, opts)
-		} else if !isSpecific {
-			res = &upstreamResult{
-				err:      errNotDomainSpecific,
-				original: upstreamAddr,
-			}
-		} else {
+	return cv.insertConfResults(s, conf)
+}
+
+// insertErrResults parses err and inserts the result into s.  It can insert
+// multiple results as well as none.
+func (cv *upstreamConfigValidator) insertErrResults(
+	s []*upstreamResult,
+	err error,
+) (result []*upstreamResult) {
+	wrapper, ok := err.(interface{ Unwrap() []error })
+	if !ok {
+		return s
+	}
+
+	errs := wrapper.Unwrap()
+	for _, e := range errs {
+		var parseErr *proxy.ParseError
+		if !errors.As(e, &parseErr) {
 			continue
 		}
 
-		res.isSpecific = isSpecific
-		s = cv.insert(s, res)
+		idx := parseErr.Idx
+		s = cv.insert(s, &upstreamResult{
+			err:      err,
+			original: fmt.Sprintf("Line: %d", idx+1),
+		})
+	}
+
+	return s
+}
+
+// insertConfResults parses conf and inserts the result into s.  It can insert
+// multiple results as well as none.
+func (cv *upstreamConfigValidator) insertConfResults(
+	s []*upstreamResult,
+	conf *proxy.UpstreamConfig,
+) (result []*upstreamResult) {
+	s = cv.insertListResults(s, conf.Upstreams, false)
+
+	for _, ups := range conf.DomainReservedUpstreams {
+		s = cv.insertListResults(s, ups, true)
+	}
+
+	for _, ups := range conf.SpecifiedDomainUpstreams {
+		s = cv.insertListResults(s, ups, true)
+	}
+
+	return s
+}
+
+// insertListResults constructs upstream results from the upstream list and
+// inserts into s.  It can insert multiple results as well as none.
+func (cv *upstreamConfigValidator) insertListResults(
+	s []*upstreamResult,
+	ups []upstream.Upstream,
+	specific bool,
+) (result []*upstreamResult) {
+	for _, u := range ups {
+		s = cv.insert(s, &upstreamResult{
+			server:     u,
+			original:   u.Address(),
+			isSpecific: specific,
+		})
 	}
 
 	return s
@@ -125,34 +165,6 @@ func (cv *upstreamConfigValidator) insert(
 	}
 
 	return slices.Insert(s, i, r)
-}
-
-// parseUpstream parses addr and returns the result of parsing.  It returns nil
-// if the specified server points at the default upstream server which is
-// validated separately.
-func (cv *upstreamConfigValidator) parseUpstream(
-	addr string,
-	opts *upstream.Options,
-) (r *upstreamResult) {
-	// Check if the upstream has a valid protocol prefix.
-	//
-	// TODO(e.burkov):  Validate the domain name.
-	if proto, _, ok := strings.Cut(addr, "://"); ok {
-		if !slices.Contains(protocols, proto) {
-			return &upstreamResult{
-				err:      fmt.Errorf("bad protocol %q", proto),
-				original: addr,
-			}
-		}
-	}
-
-	ups, err := upstream.AddressToUpstream(addr, opts)
-
-	return &upstreamResult{
-		server:   ups,
-		err:      err,
-		original: addr,
-	}
 }
 
 // check tries to exchange with each successfully parsed upstream and enriches
