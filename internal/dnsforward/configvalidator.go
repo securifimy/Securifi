@@ -2,7 +2,6 @@ package dnsforward
 
 import (
 	"fmt"
-	"strings"
 	"sync"
 
 	"github.com/AdguardTeam/dnsproxy/proxy"
@@ -10,20 +9,19 @@ import (
 	"github.com/AdguardTeam/golibs/errors"
 	"github.com/AdguardTeam/golibs/log"
 	"github.com/miekg/dns"
-	"golang.org/x/exp/slices"
 )
 
 // upstreamConfigValidator parses the [*proxy.UpstreamConfig] and checks the
 // actual DNS availability of each upstream.
 type upstreamConfigValidator struct {
 	// general is the general upstream configuration.
-	general []*upstreamResult
+	general map[string]*upstreamResult
 
 	// fallback is the fallback upstream configuration.
-	fallback []*upstreamResult
+	fallback map[string]*upstreamResult
 
 	// private is the private upstream configuration.
-	private []*upstreamResult
+	private map[string]*upstreamResult
 }
 
 // upstreamResult is a result of validation of an [upstream.Upstream] within an
@@ -36,21 +34,8 @@ type upstreamResult struct {
 	// err is the error either from parsing or from checking the upstream.
 	err error
 
-	// original is the piece of configuration that have either been turned to an
-	// upstream or caused an error.
-	original string
-
 	// isSpecific is true if the upstream is domain-specific.
 	isSpecific bool
-}
-
-// compare compares two [upstreamResult]s.  It returns 0 if they are equal, -1
-// if ur should be sorted before other, and 1 otherwise.
-//
-// TODO(e.burkov):  Perhaps it makes sense to sort the results with errors near
-// the end.
-func (ur *upstreamResult) compare(other *upstreamResult) (res int) {
-	return strings.Compare(ur.original, other.original)
 }
 
 // newUpstreamConfigValidator parses the upstream configuration and returns a
@@ -62,109 +47,99 @@ func newUpstreamConfigValidator(
 	private []string,
 	opts *upstream.Options,
 ) (cv *upstreamConfigValidator) {
-	cv = &upstreamConfigValidator{}
-
-	cv.general = cv.insertLinesResults(cv.general, general, opts)
-	cv.fallback = cv.insertLinesResults(cv.fallback, fallback, opts)
-	cv.private = cv.insertLinesResults(cv.private, private, opts)
-
-	return cv
-}
-
-// insertLinesResults parses lines and inserts the result into s.  It can insert
-// multiple results as well as none.
-func (cv *upstreamConfigValidator) insertLinesResults(
-	s []*upstreamResult,
-	lines []string,
-	opts *upstream.Options,
-) (result []*upstreamResult) {
-	conf, err := proxy.ParseUpstreamsConfig(lines, opts)
-	if err != nil {
-		s = cv.insertErrResults(s, err)
+	cv = &upstreamConfigValidator{
+		general:  map[string]*upstreamResult{},
+		fallback: map[string]*upstreamResult{},
+		private:  map[string]*upstreamResult{},
 	}
 
-	return cv.insertConfResults(s, conf)
+	conf, err := proxy.ParseUpstreamsConfig(general, opts)
+	if err != nil {
+		cv.insertErrResults(cv.general, "Upstream DNS Servers", err)
+	}
+	cv.insertConfResults(cv.general, conf)
+
+	conf, err = proxy.ParseUpstreamsConfig(fallback, opts)
+	if err != nil {
+		cv.insertErrResults(cv.fallback, "Fallback DNS Servers", err)
+	}
+	cv.insertConfResults(cv.fallback, conf)
+
+	conf, err = proxy.ParseUpstreamsConfig(private, opts)
+	if err != nil {
+		cv.insertErrResults(cv.private, "Private DNS Servers", err)
+	}
+	cv.insertConfResults(cv.private, conf)
+
+	return cv
 }
 
 // insertErrResults parses err and inserts the result into s.  It can insert
 // multiple results as well as none.
 func (cv *upstreamConfigValidator) insertErrResults(
-	s []*upstreamResult,
+	m map[string]*upstreamResult,
+	section string,
 	err error,
-) (result []*upstreamResult) {
-	wrapper, ok := err.(interface{ Unwrap() []error })
+) {
+	wrapper, ok := err.(errors.WrapperSlice)
 	if !ok {
-		return s
+		log.Debug("dnsforward: unwrapping: %s", err)
+
+		return
 	}
 
 	errs := wrapper.Unwrap()
 	for _, e := range errs {
 		var parseErr *proxy.ParseError
 		if !errors.As(e, &parseErr) {
+			log.Debug("dnsforward: inserting: %s", err)
+
 			continue
 		}
 
 		idx := parseErr.Idx
-		s = cv.insert(s, &upstreamResult{
-			err:      err,
-			original: fmt.Sprintf("Line: %d", idx+1),
-		})
-	}
 
-	return s
+		original := fmt.Sprintf("Line: %d %s", idx+1, section)
+		m[original] = &upstreamResult{err: errors.Unwrap(e)}
+	}
 }
 
 // insertConfResults parses conf and inserts the result into s.  It can insert
 // multiple results as well as none.
 func (cv *upstreamConfigValidator) insertConfResults(
-	s []*upstreamResult,
+	m map[string]*upstreamResult,
 	conf *proxy.UpstreamConfig,
-) (result []*upstreamResult) {
-	s = cv.insertListResults(s, conf.Upstreams, false)
+) {
+	cv.insertListResults(m, conf.Upstreams, false)
 
 	for _, ups := range conf.DomainReservedUpstreams {
-		s = cv.insertListResults(s, ups, true)
+		cv.insertListResults(m, ups, true)
 	}
 
 	for _, ups := range conf.SpecifiedDomainUpstreams {
-		s = cv.insertListResults(s, ups, true)
+		cv.insertListResults(m, ups, true)
 	}
-
-	return s
 }
 
 // insertListResults constructs upstream results from the upstream list and
 // inserts into s.  It can insert multiple results as well as none.
 func (cv *upstreamConfigValidator) insertListResults(
-	s []*upstreamResult,
+	m map[string]*upstreamResult,
 	ups []upstream.Upstream,
 	specific bool,
-) (result []*upstreamResult) {
+) {
 	for _, u := range ups {
-		s = cv.insert(s, &upstreamResult{
+		addr := u.Address()
+		_, ok := m[addr]
+		if ok {
+			continue
+		}
+
+		m[addr] = &upstreamResult{
 			server:     u,
-			original:   u.Address(),
 			isSpecific: specific,
-		})
+		}
 	}
-
-	return s
-}
-
-// insert inserts r into slice in a sorted order, except duplicates.  slice must
-// not be nil.
-func (cv *upstreamConfigValidator) insert(
-	s []*upstreamResult,
-	r *upstreamResult,
-) (result []*upstreamResult) {
-	i, has := slices.BinarySearchFunc(s, r, (*upstreamResult).compare)
-	if has {
-		log.Debug("dnsforward: duplicate configuration %q", r.original)
-
-		return s
-	}
-
-	return slices.Insert(s, i, r)
 }
 
 // check tries to exchange with each successfully parsed upstream and enriches
@@ -237,8 +212,10 @@ func (cv *upstreamConfigValidator) checkSrv(
 // close closes all the upstreams that were successfully parsed.  It enriches
 // the results with deferred closing errors.
 func (cv *upstreamConfigValidator) close() {
-	for _, slice := range [][]*upstreamResult{cv.general, cv.fallback, cv.private} {
-		for _, r := range slice {
+	all := []map[string]*upstreamResult{cv.general, cv.fallback, cv.private}
+
+	for _, m := range all {
+		for _, r := range m {
 			if r.server != nil {
 				r.err = errors.WithDeferred(r.err, r.server.Close())
 			}
@@ -253,14 +230,14 @@ func (cv *upstreamConfigValidator) close() {
 func (cv *upstreamConfigValidator) status() (results map[string]string) {
 	result := map[string]string{}
 
-	for _, res := range cv.general {
-		resultToStatus("general", res, result)
+	for original, res := range cv.general {
+		resultToStatus("general", original, res, result)
 	}
-	for _, res := range cv.fallback {
-		resultToStatus("fallback", res, result)
+	for original, res := range cv.fallback {
+		resultToStatus("fallback", original, res, result)
 	}
-	for _, res := range cv.private {
-		resultToStatus("private", res, result)
+	for original, res := range cv.private {
+		resultToStatus("private", original, res, result)
 	}
 
 	return result
@@ -273,24 +250,29 @@ func (cv *upstreamConfigValidator) status() (results map[string]string) {
 // TODO(e.burkov):  Currently, the HTTP handler expects that all the results are
 // put together in a single map, which may lead to collisions, see AG-27539.
 // Improve the results compilation.
-func resultToStatus(section string, res *upstreamResult, resMap map[string]string) {
+func resultToStatus(
+	section string,
+	original string,
+	res *upstreamResult,
+	resMap map[string]string,
+) {
 	val := "OK"
 	if res.err != nil {
 		val = res.err.Error()
 	}
 
-	prevVal := resMap[res.original]
+	prevVal := resMap[original]
 	switch prevVal {
 	case "":
-		resMap[res.original] = val
+		resMap[original] = val
 	case val:
-		log.Debug("dnsforward: duplicating %s config line %q", section, res.original)
+		log.Debug("dnsforward: duplicating %s config line %q", section, original)
 	default:
 		log.Debug(
 			"dnsforward: warning: %s config line %q (%v) had different result %v",
 			section,
 			val,
-			res.original,
+			original,
 			prevVal,
 		)
 	}

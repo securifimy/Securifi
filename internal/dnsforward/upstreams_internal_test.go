@@ -119,7 +119,9 @@ func TestUpstreamConfigValidator(t *testing.T) {
 		fallback: []string{"[/example/" + goodUps},
 		private:  []string{"[/example//bad.123/]" + goodUps},
 		want: map[string]string{
-			"Line: 1": `index: 0: cannot prepare the upstream 0 "[/example/]/]` + goodUps + `": unsupported url scheme: `,
+			"Line: 1 Upstream DNS Servers": "cannot prepare the upstream: unsupported url scheme: ",
+			"Line: 1 Private DNS Servers":  `bad domain name "bad.123": bad top-level domain name label "123": all octets are numeric`,
+			"Line: 1 Fallback DNS Servers": "wrong upstream specification",
 		},
 	}, {
 		name: "bad_proto",
@@ -127,7 +129,7 @@ func TestUpstreamConfigValidator(t *testing.T) {
 			"bad://1.2.3.4",
 		},
 		want: map[string]string{
-			"Line: 1": `index: 0: cannot prepare the upstream 0 "bad://1.2.3.4": unsupported url scheme: bad`,
+			"Line: 1 Upstream DNS Servers": `cannot prepare the upstream: unsupported url scheme: bad`,
 		},
 	}}
 
