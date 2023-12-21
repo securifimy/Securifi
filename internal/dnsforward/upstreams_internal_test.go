@@ -100,7 +100,9 @@ func TestUpstreamConfigValidator(t *testing.T) {
 		name:    "bad_specification",
 		general: []string{"[/domain.example/]/]1.2.3.4"},
 		want: map[string]string{
-			"/]1.2.3.4:53": `WARNING: couldn't communicate with upstream: creating dial handler: dialing "/]1.2.3.4:53": address /]1.2.3.4:53: unexpected ']' in address`,
+			"Line: 1 Upstream DNS Servers": `cannot prepare the upstream: invalid address ` +
+				`/]1.2.3.4: bad hostname "/]1.2.3.4": bad hostname label ` +
+				`"/]1": bad hostname label rune '/'`,
 		},
 	}, {
 		name:     "all_different",

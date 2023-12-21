@@ -10,6 +10,7 @@ import (
 
 	"github.com/AdguardTeam/AdGuardHome/internal/aghhttp"
 	"github.com/AdguardTeam/AdGuardHome/internal/filtering"
+	"github.com/AdguardTeam/dnsproxy/proxy"
 	"github.com/AdguardTeam/dnsproxy/upstream"
 	"github.com/AdguardTeam/golibs/errors"
 	"github.com/AdguardTeam/golibs/log"
@@ -265,7 +266,7 @@ func (req *jsonDNSConfig) checkFallbacks() (err error) {
 		return nil
 	}
 
-	err = ValidateUpstreams(*req.Fallbacks)
+	_, err = proxy.ParseUpstreamsConfig(*req.Fallbacks, &upstream.Options{})
 	if err != nil {
 		return fmt.Errorf("fallback servers: %w", err)
 	}
@@ -315,7 +316,7 @@ func (req *jsonDNSConfig) validate(privateNets netutil.SubnetSet) (err error) {
 // validateUpstreamDNSServers returns an error if any field of req is invalid.
 func (req *jsonDNSConfig) validateUpstreamDNSServers(privateNets netutil.SubnetSet) (err error) {
 	if req.Upstreams != nil {
-		err = ValidateUpstreams(*req.Upstreams)
+		_, err = proxy.ParseUpstreamsConfig(*req.Upstreams, &upstream.Options{})
 		if err != nil {
 			return fmt.Errorf("upstream servers: %w", err)
 		}

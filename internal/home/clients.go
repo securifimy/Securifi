@@ -613,7 +613,7 @@ func (clients *clientsContainer) check(c *Client) (err error) {
 
 	slices.Sort(c.Tags)
 
-	err = dnsforward.ValidateUpstreams(c.Upstreams)
+	_, err = proxy.ParseUpstreamsConfig(c.Upstreams, &upstream.Options{})
 	if err != nil {
 		return fmt.Errorf("invalid upstream servers: %w", err)
 	}

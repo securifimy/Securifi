@@ -336,7 +336,7 @@ func (h *healthchecker) check(u upstream.Upstream) (err error) {
 	if err != nil {
 		return fmt.Errorf("couldn't communicate with upstream: %w", err)
 	} else if h.ansEmpty && len(reply.Answer) > 0 {
-		return errWrongResponse
+		return errors.Error("wrong response")
 	}
 
 	return nil
