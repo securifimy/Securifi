@@ -65,7 +65,8 @@ type persistentClient struct {
 	Tags      []string
 	Upstreams []string
 
-	IPs       []netip.Addr
+	IPs []netip.Addr
+	// TODO(s.chzhen):  Use netutil.Prefix.
 	Subnets   []netip.Prefix
 	MACs      []net.HardwareAddr
 	ClientIDs []string
@@ -88,45 +89,57 @@ type persistentClient struct {
 // parseIDs parses a list of strings into typed fields.
 func (c *persistentClient) parseIDs(ids []string) (err error) {
 	for _, id := range ids {
-		if id == "" {
-			return errors.Error("clientid is empty")
-		}
-
-		var ip netip.Addr
-		if ip, err = netip.ParseAddr(id); err == nil {
-			c.IPs = append(c.IPs, ip)
-
-			continue
-		}
-
-		var subnet netip.Prefix
-		if subnet, err = netip.ParsePrefix(id); err == nil {
-			c.Subnets = append(c.Subnets, subnet)
-
-			continue
-		}
-
-		var mac net.HardwareAddr
-		if mac, err = net.ParseMAC(id); err == nil {
-			c.MACs = append(c.MACs, mac)
-
-			continue
-		}
-
-		err = dnsforward.ValidateClientID(id)
+		err = c.checkID(id)
 		if err != nil {
-			// Don't wrap the error, because it's informative enough as is.
 			return err
 		}
-
-		c.ClientIDs = append(c.ClientIDs, strings.ToLower(id))
 	}
+
+	return nil
+}
+
+// checkID parses id into typed field if there is no error.
+func (c *persistentClient) checkID(id string) (err error) {
+	if id == "" {
+		return errors.Error("clientid is empty")
+	}
+
+	var ip netip.Addr
+	if ip, err = netip.ParseAddr(id); err == nil {
+		c.IPs = append(c.IPs, ip)
+
+		return nil
+	}
+
+	var subnet netip.Prefix
+	if subnet, err = netip.ParsePrefix(id); err == nil {
+		c.Subnets = append(c.Subnets, subnet)
+
+		return nil
+	}
+
+	var mac net.HardwareAddr
+	if mac, err = net.ParseMAC(id); err == nil {
+		c.MACs = append(c.MACs, mac)
+
+		return nil
+	}
+
+	err = dnsforward.ValidateClientID(id)
+	if err != nil {
+		// Don't wrap the error, because it's informative enough as is.
+		return err
+	}
+
+	c.ClientIDs = append(c.ClientIDs, strings.ToLower(id))
 
 	return nil
 }
 
 // ids returns a list of client ids.
 func (c *persistentClient) ids() (ids []string) {
+	ids = make([]string, 0, c.idsLen())
+
 	for _, ip := range c.IPs {
 		ids = append(ids, ip.String())
 	}
@@ -142,9 +155,14 @@ func (c *persistentClient) ids() (ids []string) {
 	return append(ids, c.ClientIDs...)
 }
 
-// shallowClone returns a deep copy of the client, except upstreamConfig,
+// idsLen returns a length of client ids.
+func (c *persistentClient) idsLen() (n int) {
+	return len(c.IPs) + len(c.Subnets) + len(c.MACs) + len(c.ClientIDs)
+}
+
+// clone returns a deep copy of the client, except upstreamConfig,
 // safeSearchConf, SafeSearch fields, because it's difficult to copy them.
-func (c *persistentClient) shallowClone() (sh *persistentClient) {
+func (c *persistentClient) clone() (sh *persistentClient) {
 	clone := *c
 
 	clone.BlockedServices = c.BlockedServices.Clone()

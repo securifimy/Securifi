@@ -314,7 +314,7 @@ func (clients *clientsContainer) forConfig() (objs []*clientObject) {
 
 			BlockedServices: cli.BlockedServices.Clone(),
 
-			IDs:       stringutil.CloneSlice(cli.ids()),
+			IDs:       cli.ids(),
 			Tags:      stringutil.CloneSlice(cli.Tags),
 			Upstreams: stringutil.CloneSlice(cli.Upstreams),
 
@@ -453,7 +453,7 @@ func (clients *clientsContainer) find(id string) (c *persistentClient, ok bool) 
 		return nil, false
 	}
 
-	return c.shallowClone(), true
+	return c.clone(), true
 }
 
 // shouldCountClient is a wrapper around [clientsContainer.find] to make it a
@@ -608,7 +608,7 @@ func (clients *clientsContainer) check(c *persistentClient) (err error) {
 		return errors.Error("client is nil")
 	case c.Name == "":
 		return errors.Error("invalid name")
-	case len(c.IPs)+len(c.Subnets)+len(c.MACs)+len(c.ClientIDs) == 0:
+	case c.idsLen() == 0:
 		return errors.Error("id required")
 	default:
 		// Go on.
