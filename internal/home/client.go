@@ -3,13 +3,19 @@ package home
 import (
 	"encoding"
 	"fmt"
+	"net"
+	"net/netip"
+	"strings"
 	"time"
 
+	"github.com/AdguardTeam/AdGuardHome/internal/dnsforward"
 	"github.com/AdguardTeam/AdGuardHome/internal/filtering"
 	"github.com/AdguardTeam/AdGuardHome/internal/filtering/safesearch"
 	"github.com/AdguardTeam/dnsproxy/proxy"
+	"github.com/AdguardTeam/golibs/errors"
 	"github.com/AdguardTeam/golibs/stringutil"
 	"github.com/google/uuid"
+	"golang.org/x/exp/slices"
 )
 
 // UID is the type for the unique IDs of persistent clients.
@@ -56,9 +62,13 @@ type persistentClient struct {
 
 	Name string
 
-	IDs       []string
 	Tags      []string
 	Upstreams []string
+
+	IPs       []netip.Addr
+	Subnets   []netip.Prefix
+	MACs      []net.HardwareAddr
+	ClientIDs []string
 
 	// UID is the unique identifier of the persistent client.
 	UID UID
@@ -75,15 +85,76 @@ type persistentClient struct {
 	IgnoreStatistics      bool
 }
 
-// ShallowClone returns a deep copy of the client, except upstreamConfig,
+// parseIDs parses a list of strings into typed fields.
+func (c *persistentClient) parseIDs(ids []string) (err error) {
+	for _, id := range ids {
+		if id == "" {
+			return errors.Error("clientid is empty")
+		}
+
+		var ip netip.Addr
+		if ip, err = netip.ParseAddr(id); err == nil {
+			c.IPs = append(c.IPs, ip)
+
+			continue
+		}
+
+		var subnet netip.Prefix
+		if subnet, err = netip.ParsePrefix(id); err == nil {
+			c.Subnets = append(c.Subnets, subnet)
+
+			continue
+		}
+
+		var mac net.HardwareAddr
+		if mac, err = net.ParseMAC(id); err == nil {
+			c.MACs = append(c.MACs, mac)
+
+			continue
+		}
+
+		err = dnsforward.ValidateClientID(id)
+		if err != nil {
+			// Don't wrap the error, because it's informative enough as is.
+			return err
+		}
+
+		c.ClientIDs = append(c.ClientIDs, strings.ToLower(id))
+	}
+
+	return nil
+}
+
+// ids returns a list of client ids.
+func (c *persistentClient) ids() (ids []string) {
+	for _, ip := range c.IPs {
+		ids = append(ids, ip.String())
+	}
+
+	for _, subnet := range c.Subnets {
+		ids = append(ids, subnet.String())
+	}
+
+	for _, mac := range c.MACs {
+		ids = append(ids, mac.String())
+	}
+
+	return append(ids, c.ClientIDs...)
+}
+
+// shallowClone returns a deep copy of the client, except upstreamConfig,
 // safeSearchConf, SafeSearch fields, because it's difficult to copy them.
-func (c *persistentClient) ShallowClone() (sh *persistentClient) {
+func (c *persistentClient) shallowClone() (sh *persistentClient) {
 	clone := *c
 
 	clone.BlockedServices = c.BlockedServices.Clone()
-	clone.IDs = stringutil.CloneSlice(c.IDs)
 	clone.Tags = stringutil.CloneSlice(c.Tags)
 	clone.Upstreams = stringutil.CloneSlice(c.Upstreams)
+
+	clone.IPs = slices.Clone(c.IPs)
+	clone.Subnets = slices.Clone(c.Subnets)
+	clone.MACs = slices.Clone(c.MACs)
+	clone.ClientIDs = slices.Clone(c.ClientIDs)
 
 	return &clone
 }
