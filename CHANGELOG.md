@@ -62,6 +62,7 @@ NOTE: Add new changes BELOW THIS COMMENT.
 
 ### Fixed
 
+- Schedule display in the client settings
 - Non-anonymized IP addresses on the dashboard ([#6584]).
 - Maximum cache TTL requirement when editing minimum cache TTL in the Web UI
   ([#6409]).

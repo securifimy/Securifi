@@ -21,10 +21,7 @@ export const ScheduleForm = ({
     const onModalOpen = () => setModalOpen(true);
     const onModalClose = () => setModalOpen(false);
 
-    const filteredScheduleKeys = useMemo(() => (
-        schedule ? Object.keys(schedule).filter((v) => v !== 'time_zone') : []
-    ), [schedule]);
-
+    const filteredScheduleKeys = schedule ? Object.keys(schedule).filter((v) => v !== 'time_zone') : [];
     const scheduleMap = new Map();
     filteredScheduleKeys.forEach((day) => scheduleMap.set(day, schedule[day]));
 
