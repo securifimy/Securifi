@@ -34,11 +34,11 @@ NOTE: Add new changes BELOW THIS COMMENT.
 
 ### Changed
 
+- The frontend sends `load_balance` instead of the deprecated empty string for `"upstream_mode"`.
 - Logging level of timeout errors is now `error` instead of `debug` ([#6574]).
 - The field `"upstream_mode"` in `POST /control/dns_config` and
   `GET /control/dns_info` HTTP APIs now accepts `load_balance` value.  Check
   `openapi/CHANGELOG.md` for more details.
-- The frontend sends `load_balance` instead of the deprecated empty string for `"upstream_mode"`.
 
 #### Configuration changes
 
