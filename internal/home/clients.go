@@ -234,7 +234,7 @@ func (o *clientObject) toPersistent(
 		UpstreamsCacheSize:    o.UpstreamsCacheSize,
 	}
 
-	err = cli.parseIDs(o.IDs)
+	err = cli.setIDs(o.IDs)
 	if err != nil {
 		return nil, fmt.Errorf("parsing ids: %w", err)
 	}
@@ -266,15 +266,7 @@ func (o *clientObject) toPersistent(
 
 	cli.BlockedServices = o.BlockedServices.Clone()
 
-	for _, t := range o.Tags {
-		if allTags.Has(t) {
-			cli.Tags = append(cli.Tags, t)
-		} else {
-			log.Info("skipping unknown tag %q", t)
-		}
-	}
-
-	slices.Sort(cli.Tags)
+	cli.setTags(o.Tags, allTags)
 
 	return cli, nil
 }
@@ -453,7 +445,7 @@ func (clients *clientsContainer) find(id string) (c *persistentClient, ok bool) 
 		return nil, false
 	}
 
-	return c.clone(), true
+	return c.shallowClone(), true
 }
 
 // shouldCountClient is a wrapper around [clientsContainer.find] to make it a
@@ -725,14 +717,18 @@ func (clients *clientsContainer) update(prev, c *persistentClient) (err error) {
 		}
 	}
 
+	if c.compareIDs(prev) {
+		clients.removeLocked(prev)
+		clients.addLocked(c)
+
+		return nil
+	}
+
 	// Check the ID index.
-	ids := c.ids()
-	if !slices.Equal(prev.ids(), ids) {
-		for _, id := range ids {
-			existing, ok := clients.idIndex[id]
-			if ok && existing != prev {
-				return fmt.Errorf("id %q is used by client with name %q", id, existing.Name)
-			}
+	for _, id := range c.ids() {
+		existing, ok := clients.idIndex[id]
+		if ok && existing != prev {
+			return fmt.Errorf("id %q is used by client with name %q", id, existing.Name)
 		}
 	}
 

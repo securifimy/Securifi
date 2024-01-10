@@ -13,6 +13,7 @@ import (
 	"github.com/AdguardTeam/AdGuardHome/internal/filtering/safesearch"
 	"github.com/AdguardTeam/dnsproxy/proxy"
 	"github.com/AdguardTeam/golibs/errors"
+	"github.com/AdguardTeam/golibs/log"
 	"github.com/AdguardTeam/golibs/stringutil"
 	"github.com/google/uuid"
 	"golang.org/x/exp/slices"
@@ -86,20 +87,47 @@ type persistentClient struct {
 	IgnoreStatistics      bool
 }
 
-// parseIDs parses a list of strings into typed fields.
-func (c *persistentClient) parseIDs(ids []string) (err error) {
+// setTags sets the tags if they are known, otherwise logs an unknown tag.
+func (c *persistentClient) setTags(tags []string, known *stringutil.Set) {
+	for _, t := range tags {
+		if !known.Has(t) {
+			log.Info("skipping unknown tag %q", t)
+
+			continue
+		}
+
+		c.Tags = append(c.Tags, t)
+	}
+
+	slices.Sort(c.Tags)
+}
+
+// setIDs parses a list of strings into typed fields and returns an error if
+// there is one.
+func (c *persistentClient) setIDs(ids []string) (err error) {
 	for _, id := range ids {
-		err = c.checkID(id)
+		err = c.setID(id)
 		if err != nil {
 			return err
 		}
 	}
 
+	slices.SortFunc(c.IPs, netip.Addr.Compare)
+	slices.SortFunc(c.Subnets, func(a, b netip.Prefix) int {
+		return strings.Compare(a.String(), b.String())
+	})
+
+	slices.SortFunc(c.MACs, func(a, b net.HardwareAddr) int {
+		return strings.Compare(a.String(), b.String())
+	})
+
+	slices.Sort(c.ClientIDs)
+
 	return nil
 }
 
-// checkID parses id into typed field if there is no error.
-func (c *persistentClient) checkID(id string) (err error) {
+// setID parses id into typed field if there is no error.
+func (c *persistentClient) setID(id string) (err error) {
 	if id == "" {
 		return errors.Error("clientid is empty")
 	}
@@ -160,10 +188,38 @@ func (c *persistentClient) idsLen() (n int) {
 	return len(c.IPs) + len(c.Subnets) + len(c.MACs) + len(c.ClientIDs)
 }
 
-// clone returns a deep copy of the client, except upstreamConfig,
+// compareIDs returns true if the ids of the current and previous clients are
+// the same.
+func (c *persistentClient) compareIDs(prev *persistentClient) (equal bool) {
+	n := slices.CompareFunc(c.IPs, prev.IPs, netip.Addr.Compare)
+	if n != 0 {
+		return false
+	}
+
+	n = slices.CompareFunc(c.Subnets, prev.Subnets, func(a, b netip.Prefix) int {
+		return strings.Compare(a.String(), b.String())
+	})
+
+	if n != 0 {
+		return false
+	}
+
+	n = slices.CompareFunc(c.MACs, prev.MACs, func(a, b net.HardwareAddr) int {
+		return strings.Compare(a.String(), b.String())
+	})
+
+	if n != 0 {
+		return false
+	}
+
+	return slices.Compare(c.ClientIDs, prev.ClientIDs) == 0
+}
+
+// shallowClone returns a deep copy of the client, except upstreamConfig,
 // safeSearchConf, SafeSearch fields, because it's difficult to copy them.
-func (c *persistentClient) clone() (sh *persistentClient) {
-	clone := *c
+func (c *persistentClient) shallowClone() (clone *persistentClient) {
+	clone = &persistentClient{}
+	*clone = *c
 
 	clone.BlockedServices = c.BlockedServices.Clone()
 	clone.Tags = stringutil.CloneSlice(c.Tags)
@@ -174,7 +230,7 @@ func (c *persistentClient) clone() (sh *persistentClient) {
 	clone.MACs = slices.Clone(c.MACs)
 	clone.ClientIDs = slices.Clone(c.ClientIDs)
 
-	return &clone
+	return clone
 }
 
 // closeUpstreams closes the client-specific upstream config of c if any.

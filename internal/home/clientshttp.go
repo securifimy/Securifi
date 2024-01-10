@@ -195,7 +195,7 @@ func (clients *clientsContainer) jsonToClient(
 		return nil, err
 	}
 
-	err = c.parseIDs(cj.IDs)
+	err = c.setIDs(cj.IDs)
 	if err != nil {
 		// Don't wrap the error since it's informative enough as is.
 		return nil, err
