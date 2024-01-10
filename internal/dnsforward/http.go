@@ -274,9 +274,12 @@ func (req *jsonDNSConfig) checkBootstrap() (err error) {
 			return errors.Error("empty")
 		}
 
-		if _, err = upstream.NewUpstreamResolver(b, nil); err != nil {
+		var resolver *upstream.UpstreamResolver
+		if resolver, err = upstream.NewUpstreamResolver(b, nil); err != nil {
 			// Don't wrap the error because it's informative enough as is.
 			return err
+		} else if err = resolver.Close(); err != nil {
+			return fmt.Errorf("closing %s: %w", b, err)
 		}
 	}
 
