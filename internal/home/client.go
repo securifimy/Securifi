@@ -191,27 +191,10 @@ func (c *persistentClient) idsLen() (n int) {
 // equalIDs returns true if the ids of the current and previous clients are the
 // same.
 func (c *persistentClient) equalIDs(prev *persistentClient) (equal bool) {
-	if !slices.Equal(c.IPs, prev.IPs) {
-		return false
-	}
-
-	if !slices.Equal(c.Subnets, prev.Subnets) {
-		return false
-	}
-
-	eq := slices.EqualFunc(c.MACs, prev.MACs, func(a, b net.HardwareAddr) bool {
-		return a.String() == b.String()
-	})
-
-	if !eq {
-		return false
-	}
-
-	if !slices.Equal(c.ClientIDs, prev.ClientIDs) {
-		return false
-	}
-
-	return true
+	return slices.Equal(c.IPs, prev.IPs) &&
+		slices.Equal(c.Subnets, prev.Subnets) &&
+		slices.EqualFunc(c.MACs, prev.MACs, slices.Equal[net.HardwareAddr]) &&
+		slices.Equal(c.ClientIDs, prev.ClientIDs)
 }
 
 // shallowClone returns a deep copy of the client, except upstreamConfig,
@@ -221,8 +204,8 @@ func (c *persistentClient) shallowClone() (clone *persistentClient) {
 	*clone = *c
 
 	clone.BlockedServices = c.BlockedServices.Clone()
-	clone.Tags = stringutil.CloneSlice(c.Tags)
-	clone.Upstreams = stringutil.CloneSlice(c.Upstreams)
+	clone.Tags = slices.Clone(c.Tags)
+	clone.Upstreams = slices.Clone(c.Upstreams)
 
 	clone.IPs = slices.Clone(c.IPs)
 	clone.Subnets = slices.Clone(c.Subnets)
