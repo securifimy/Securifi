@@ -1,6 +1,7 @@
 package home
 
 import (
+	"bytes"
 	"encoding"
 	"fmt"
 	"net"
@@ -113,17 +114,37 @@ func (c *persistentClient) setIDs(ids []string) (err error) {
 	}
 
 	slices.SortFunc(c.IPs, netip.Addr.Compare)
-	slices.SortFunc(c.Subnets, func(a, b netip.Prefix) int {
-		return strings.Compare(a.String(), b.String())
-	})
 
+	// TODO(s.chzhen):  Use netip.PrefixCompare in Go 1.23.
+	slices.SortFunc(c.Subnets, subnetCompare)
 	slices.SortFunc(c.MACs, func(a, b net.HardwareAddr) int {
-		return strings.Compare(a.String(), b.String())
+		return bytes.Compare(a, b)
 	})
 
 	slices.Sort(c.ClientIDs)
 
 	return nil
+}
+
+// subnetCompare is a comparison function for the two subnets.  It returns -1 if
+// x sorts before y, 1 if x sorts after y, and 0 if their relative sorting
+// position is the same.
+func subnetCompare(x, y netip.Prefix) (cmp int) {
+	if x == y {
+		return 0
+	}
+
+	xAddr, xBits := x.Addr(), x.Bits()
+	yAddr, yBits := y.Addr(), y.Bits()
+	if xBits == yBits {
+		return xAddr.Compare(yAddr)
+	}
+
+	if xBits > yBits {
+		return -1
+	} else {
+		return 1
+	}
 }
 
 // setID parses id into typed field if there is no error.
