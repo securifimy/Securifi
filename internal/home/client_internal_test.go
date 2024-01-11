@@ -19,7 +19,7 @@ func TestPersistentClient_EqualIDs(t *testing.T) {
 
 		mac  = "00-00-00-00-00-00"
 		mac1 = "11-11-11-11-11-11"
-		mac2 = "22-20-22-22-22-22"
+		mac2 = "22-22-22-22-22-22"
 
 		cli  = "client0"
 		cli1 = "client1"
@@ -112,11 +112,11 @@ func TestPersistentClient_EqualIDs(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			c := &persistentClient{}
 			err := c.setIDs(tc.ids)
-			require.Nil(t, err)
+			require.NoError(t, err)
 
 			prev := &persistentClient{}
 			err = prev.setIDs(tc.prevIDs)
-			require.Nil(t, err)
+			require.NoError(t, err)
 
 			equal := c.equalIDs(prev)
 			assert.Equal(t, tc.want, equal)
