@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestPersistentClient_CompareIDs(t *testing.T) {
+func TestPersistentClient_EqualIDs(t *testing.T) {
 	const (
 		ip  = "0.0.0.0"
 		ip1 = "1.1.1.1"
@@ -118,7 +118,7 @@ func TestPersistentClient_CompareIDs(t *testing.T) {
 			err = prev.setIDs(tc.prevIDs)
 			require.Nil(t, err)
 
-			equal := c.compareIDs(prev)
+			equal := c.equalIDs(prev)
 			assert.Equal(t, tc.want, equal)
 		})
 	}

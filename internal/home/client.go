@@ -188,31 +188,30 @@ func (c *persistentClient) idsLen() (n int) {
 	return len(c.IPs) + len(c.Subnets) + len(c.MACs) + len(c.ClientIDs)
 }
 
-// compareIDs returns true if the ids of the current and previous clients are
-// the same.
-func (c *persistentClient) compareIDs(prev *persistentClient) (equal bool) {
-	n := slices.CompareFunc(c.IPs, prev.IPs, netip.Addr.Compare)
-	if n != 0 {
+// equalIDs returns true if the ids of the current and previous clients are the
+// same.
+func (c *persistentClient) equalIDs(prev *persistentClient) (equal bool) {
+	if !slices.Equal(c.IPs, prev.IPs) {
 		return false
 	}
 
-	n = slices.CompareFunc(c.Subnets, prev.Subnets, func(a, b netip.Prefix) int {
-		return strings.Compare(a.String(), b.String())
+	if !slices.Equal(c.Subnets, prev.Subnets) {
+		return false
+	}
+
+	eq := slices.EqualFunc(c.MACs, prev.MACs, func(a, b net.HardwareAddr) bool {
+		return a.String() == b.String()
 	})
 
-	if n != 0 {
+	if !eq {
 		return false
 	}
 
-	n = slices.CompareFunc(c.MACs, prev.MACs, func(a, b net.HardwareAddr) int {
-		return strings.Compare(a.String(), b.String())
-	})
-
-	if n != 0 {
+	if !slices.Equal(c.ClientIDs, prev.ClientIDs) {
 		return false
 	}
 
-	return slices.Compare(c.ClientIDs, prev.ClientIDs) == 0
+	return true
 }
 
 // shallowClone returns a deep copy of the client, except upstreamConfig,

@@ -717,7 +717,7 @@ func (clients *clientsContainer) update(prev, c *persistentClient) (err error) {
 		}
 	}
 
-	if c.compareIDs(prev) {
+	if c.equalIDs(prev) {
 		clients.removeLocked(prev)
 		clients.addLocked(c)
 
