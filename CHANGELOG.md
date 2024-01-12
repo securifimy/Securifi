@@ -62,7 +62,8 @@ NOTE: Add new changes BELOW THIS COMMENT.
 
 ### Fixed
 
-- Schedule display in the client settings
+- Schedule display in the client settings after creating or updating.
+- Zero value in `querylog.size_memory` disables logging ([#6570]).
 - Non-anonymized IP addresses on the dashboard ([#6584]).
 - Maximum cache TTL requirement when editing minimum cache TTL in the Web UI
   ([#6409]).
@@ -81,6 +82,7 @@ NOTE: Add new changes BELOW THIS COMMENT.
 [#6541]: https://github.com/AdguardTeam/AdGuardHome/issues/6541
 [#6545]: https://github.com/AdguardTeam/AdGuardHome/issues/6545
 [#6568]: https://github.com/AdguardTeam/AdGuardHome/issues/6568
+[#6570]: https://github.com/AdguardTeam/AdGuardHome/issues/6570
 [#6574]: https://github.com/AdguardTeam/AdGuardHome/issues/6574
 [#6584]: https://github.com/AdguardTeam/AdGuardHome/issues/6584
 
