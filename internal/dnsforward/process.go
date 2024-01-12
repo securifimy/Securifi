@@ -350,7 +350,7 @@ func (s *Server) processDetermineLocal(dctx *dnsContext) (rc resultCode) {
 
 	rc = resultCodeSuccess
 
-	dctx.isLocalClient = s.privateNets.Contains(dctx.proxyCtx.Addr.Addr().AsSlice())
+	dctx.isLocalClient = s.privateNets.Contains(dctx.proxyCtx.Addr.Addr())
 
 	return rc
 }
@@ -491,14 +491,7 @@ func extractARPASubnet(domain string) (pref netip.Prefix, err error) {
 		}
 	}
 
-	var subnet *net.IPNet
-	subnet, err = netutil.SubnetFromReversedAddr(domain[idx:])
-	if err != nil {
-		// Don't wrap the error since it's informative enough as is.
-		return netip.Prefix{}, err
-	}
-
-	return netutil.IPNetToPrefixNoMapped(subnet)
+	return netutil.PrefixFromReversedAddr(domain[idx:])
 }
 
 // processRestrictLocal responds with NXDOMAIN to PTR requests for IP addresses
@@ -532,8 +525,7 @@ func (s *Server) processRestrictLocal(dctx *dnsContext) (rc resultCode) {
 	// assume that all the DHCP leases we give are locally served or at least
 	// shouldn't be accessible externally.
 	subnetAddr := subnet.Addr()
-	addrData := subnetAddr.AsSlice()
-	if !s.privateNets.Contains(addrData) {
+	if !s.privateNets.Contains(subnetAddr) {
 		return resultCodeSuccess
 	}
 
@@ -548,7 +540,7 @@ func (s *Server) processRestrictLocal(dctx *dnsContext) (rc resultCode) {
 	}
 
 	// Do not perform unreversing ever again.
-	dctx.unreversedReqIP = addrData
+	dctx.unreversedReqIP = subnetAddr.AsSlice()
 
 	// There is no need to filter request from external addresses since this
 	// code is only executed when the request is for locally served ARPA
