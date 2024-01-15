@@ -1,7 +1,6 @@
 package home
 
 import (
-	"bytes"
 	"fmt"
 	"net"
 	"net/netip"
@@ -550,10 +549,9 @@ func (clients *clientsContainer) findDHCP(ip netip.Addr) (c *persistentClient, o
 	}
 
 	for _, c = range clients.list {
-		for _, mac := range c.MACs {
-			if bytes.Equal(mac, foundMAC) {
-				return c, true
-			}
+		_, found := slices.BinarySearchFunc(c.MACs, foundMAC, slices.Compare[net.HardwareAddr])
+		if found {
+			return c, true
 		}
 	}
 
@@ -593,7 +591,7 @@ func (clients *clientsContainer) findRuntimeClient(ip netip.Addr) (rc *client.Ru
 	return rc, ok
 }
 
-// check validates the client.
+// check validates the client.  It also sorts the client tags.
 func (clients *clientsContainer) check(c *persistentClient) (err error) {
 	switch {
 	case c == nil:
@@ -612,6 +610,7 @@ func (clients *clientsContainer) check(c *persistentClient) (err error) {
 		}
 	}
 
+	// TODO(s.chzhen):  Move to the constructor.
 	slices.Sort(c.Tags)
 
 	err = dnsforward.ValidateUpstreams(c.Upstreams)
@@ -640,7 +639,8 @@ func (clients *clientsContainer) add(c *persistentClient) (ok bool, err error) {
 	}
 
 	// check ID index
-	for _, id := range c.ids() {
+	ids := c.ids()
+	for _, id := range ids {
 		var c2 *persistentClient
 		c2, ok = clients.idIndex[id]
 		if ok {
@@ -650,7 +650,7 @@ func (clients *clientsContainer) add(c *persistentClient) (ok bool, err error) {
 
 	clients.addLocked(c)
 
-	log.Debug("clients: added %q: ID:%q [%d]", c.Name, c.ids(), len(clients.list))
+	log.Debug("clients: added %q: ID:%q [%d]", c.Name, ids, len(clients.list))
 
 	return true, nil
 }

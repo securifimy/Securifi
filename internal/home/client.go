@@ -1,7 +1,6 @@
 package home
 
 import (
-	"bytes"
 	"encoding"
 	"fmt"
 	"net"
@@ -117,10 +116,7 @@ func (c *persistentClient) setIDs(ids []string) (err error) {
 
 	// TODO(s.chzhen):  Use netip.PrefixCompare in Go 1.23.
 	slices.SortFunc(c.Subnets, subnetCompare)
-	slices.SortFunc(c.MACs, func(a, b net.HardwareAddr) int {
-		return bytes.Compare(a, b)
-	})
-
+	slices.SortFunc(c.MACs, slices.Compare[net.HardwareAddr])
 	slices.Sort(c.ClientIDs)
 
 	return nil
@@ -185,7 +181,7 @@ func (c *persistentClient) setID(id string) (err error) {
 	return nil
 }
 
-// ids returns a list of client ids.
+// ids returns a list of client ids containing at least one element.
 func (c *persistentClient) ids() (ids []string) {
 	ids = make([]string, 0, c.idsLen())
 
