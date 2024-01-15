@@ -302,6 +302,8 @@ const (
 // newProxyConfig creates and validates configuration for the main proxy.
 func (s *Server) newProxyConfig() (conf *proxy.Config, err error) {
 	srvConf := s.conf
+	trustedPrefixes := netutil.UnembedPrefixes(srvConf.TrustedProxies)
+
 	conf = &proxy.Config{
 		HTTP3:                  srvConf.ServeHTTP3,
 		Ratelimit:              int(srvConf.Ratelimit),
@@ -309,7 +311,7 @@ func (s *Server) newProxyConfig() (conf *proxy.Config, err error) {
 		RatelimitSubnetLenIPv6: srvConf.RatelimitSubnetLenIPv6,
 		RatelimitWhitelist:     srvConf.RatelimitWhitelist,
 		RefuseAny:              srvConf.RefuseAny,
-		TrustedProxies:         netutil.UnembedPrefixes(srvConf.TrustedProxies),
+		TrustedProxies:         netutil.SliceSubnetSet(trustedPrefixes),
 		CacheMinTTL:            srvConf.CacheMinTTL,
 		CacheMaxTTL:            srvConf.CacheMaxTTL,
 		CacheOptimistic:        srvConf.CacheOptimistic,
