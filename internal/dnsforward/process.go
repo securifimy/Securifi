@@ -36,11 +36,8 @@ type dnsContext struct {
 
 	// unreversedReqIP stores an IP address obtained from a PTR request if it
 	// was parsed successfully and belongs to one of the locally served IP
-	// ranges.  It is also filled with unmapped version of the address if it's
-	// within DNS64 prefixes.
-	//
-	// TODO(e.burkov):  Use netip.Addr when we switch to netip more fully.
-	unreversedReqIP net.IP
+	// ranges.
+	unreversedReqIP netip.Addr
 
 	// err is the error returned from a processing function.
 	err error
@@ -540,7 +537,7 @@ func (s *Server) processRestrictLocal(dctx *dnsContext) (rc resultCode) {
 	}
 
 	// Do not perform unreversing ever again.
-	dctx.unreversedReqIP = subnetAddr.AsSlice()
+	dctx.unreversedReqIP = subnetAddr
 
 	// There is no need to filter request from external addresses since this
 	// code is only executed when the request is for locally served ARPA
@@ -565,16 +562,8 @@ func (s *Server) processDHCPAddrs(dctx *dnsContext) (rc resultCode) {
 		return resultCodeSuccess
 	}
 
-	ip := dctx.unreversedReqIP
-	if ip == nil {
-		return resultCodeSuccess
-	}
-
-	// TODO(a.garipov):  Remove once we switch to [netip.Addr] more fully.
-	ipAddr, err := netutil.IPToAddrNoMapped(ip)
-	if err != nil {
-		log.Debug("dnsforward: bad reverse ip %v from dhcp: %s", ip, err)
-
+	ipAddr := dctx.unreversedReqIP
+	if ipAddr == (netip.Addr{}) {
 		return resultCodeSuccess
 	}
 
@@ -583,7 +572,7 @@ func (s *Server) processDHCPAddrs(dctx *dnsContext) (rc resultCode) {
 		return resultCodeSuccess
 	}
 
-	log.Debug("dnsforward: dhcp client %s is %q", ip, host)
+	log.Debug("dnsforward: dhcp client %s is %q", ipAddr, host)
 
 	req := pctx.Req
 	resp := s.makeResponse(req)
@@ -616,7 +605,7 @@ func (s *Server) processLocalPTR(dctx *dnsContext) (rc resultCode) {
 	}
 
 	ip := dctx.unreversedReqIP
-	if ip == nil {
+	if ip == (netip.Addr{}) {
 		return resultCodeSuccess
 	}
 
