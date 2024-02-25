@@ -1,8 +1,8 @@
 &nbsp;
 <p align="center">
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="doc/adguard_home_darkmode.svg">
-        <img alt="AdGuard Home" src="doc/adguard_home_lightmode.svg" width="300px">
+        <source media="(prefers-color-scheme: dark)" srcset="doc/securifi_darkmode.svg">
+        <img alt="Securifi" src="doc/securifi_lightmode.svg" width="300px">
     </picture>
 </p>
 <h3 align="center">Privacy protection center for you and your devices</h3>
@@ -11,45 +11,45 @@
     server.
 </p>
 <p align="center">
-    <a href="https://adguard.com/">AdGuard.com</a> |
-    <a href="https://github.com/AdguardTeam/AdGuardHome/wiki">Wiki</a> |
-    <a href="https://reddit.com/r/Adguard">Reddit</a> |
-    <a href="https://twitter.com/AdGuard">Twitter</a> |
-    <a href="https://t.me/adguard_en">Telegram</a>
+    <a href="https://securifi.com.my/">securifi.com.my</a> |
+    <a href="https://github.com/securifimy/Securifi/wiki">Wiki</a> |
+    <a href="https://reddit.com/r/Securifi">Reddit</a> |
+    <a href="https://twitter.com/Securifi">Twitter</a> |
+    <a href="https://t.me/securifi_en">Telegram</a>
     <br/><br/>
-    <a href="https://codecov.io/github/AdguardTeam/AdGuardHome?branch=master">
-      <img src="https://img.shields.io/codecov/c/github/AdguardTeam/AdGuardHome/master.svg" alt="Code Coverage"/>
+    <a href="https://codecov.io/github/securifimy/Securifi?branch=master">
+      <img src="https://img.shields.io/codecov/c/github/securifimy/Securifi/master.svg" alt="Code Coverage"/>
     </a>
-    <a href="https://goreportcard.com/report/AdguardTeam/AdGuardHome">
-      <img src="https://goreportcard.com/badge/github.com/AdguardTeam/AdGuardHome" alt="Go Report Card"/>
+    <a href="https://goreportcard.com/report/securifimy/Securifi">
+      <img src="https://goreportcard.com/badge/github.com/securifimy/Securifi" alt="Go Report Card"/>
     </a>
-    <a href="https://hub.docker.com/r/adguard/adguardhome">
-        <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/adguard/adguardhome.svg?maxAge=604800"/>
+    <a href="https://hub.docker.com/r/securifi/securifi">
+        <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/securifi/securifi.svg?maxAge=604800"/>
     </a>
     <br/>
-    <a href="https://github.com/AdguardTeam/AdGuardHome/releases">
-        <img src="https://img.shields.io/github/release/AdguardTeam/AdGuardHome/all.svg" alt="Latest release"/>
+    <a href="https://github.com/securifimy/Securifi/releases">
+        <img src="https://img.shields.io/github/release/securifimy/Securifi/all.svg" alt="Latest release"/>
     </a>
-    <a href="https://snapcraft.io/adguard-home">
-        <img alt="adguard-home" src="https://snapcraft.io/adguard-home/badge.svg"/>
+    <a href="https://snapcraft.io/securifi-home">
+        <img alt="securifi-home" src="https://snapcraft.io/securifi-home/badge.svg"/>
     </a>
 </p>
 <br/>
 <p align="center">
-    <img src="https://cdn.adtidy.org/public/Adguard/Common/adguard_home.gif" width="800"/>
+    <img src="https://cdn.adtidy.org/public/Securifi/Common/securifi.gif" width="800"/>
 </p>
 <hr/>
 
-AdGuard Home is a network-wide software for blocking ads and tracking. After you
+Securifi is a network-wide software for blocking ads and tracking. After you
 set it up, it'll cover ALL your home devices, and you don't need any client-side
 software for that.
 
 It operates as a DNS server that re-routes tracking domains to a “black hole”,
 thus preventing your devices from connecting to those servers.  It's based on
-software we use for our public [AdGuard DNS] servers, and both share a lot of
+software we use for our public [Securifi DNS] servers, and both share a lot of
 code.
 
-[AdGuard DNS]: https://adguard-dns.io/
+[Securifi DNS]: https://securifi-dns.io/
 
 
 
@@ -58,10 +58,10 @@ code.
      *  [Alternative methods](#alternative-methods)
      *  [Guides](#guides)
      *  [API](#api)
- *  [Comparing AdGuard Home to other solutions](#comparison)
-     *  [How is this different from public AdGuard DNS servers?](#comparison-adguard-dns)
-     *  [How does AdGuard Home compare to Pi-Hole](#comparison-pi-hole)
-     *  [How does AdGuard Home compare to traditional ad blockers](#comparison-adblock)
+ *  [Comparing Securifi to other solutions](#comparison)
+     *  [How is this different from public Securifi DNS servers?](#comparison-securifi-dns)
+     *  [How does Securifi compare to Pi-Hole](#comparison-pi-hole)
+     *  [How does Securifi compare to traditional ad blockers](#comparison-adblock)
      *  [Known limitations](#comparison-limitations)
  *  [How to build from source](#how-to-build)
      *  [Prerequisites](#prerequisites)
@@ -71,7 +71,7 @@ code.
      *  [Reporting issues](#reporting-issues)
      *  [Help with translations](#translate)
      *  [Other](#help-other)
- *  [Projects that use AdGuard Home](#uses)
+ *  [Projects that use Securifi](#uses)
  *  [Acknowledgments](#acknowledgments)
  *  [Privacy](#privacy)
 
@@ -84,26 +84,26 @@ code.
 To install with `curl` run the following command:
 
 ```sh
-curl -s -S -L https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/scripts/install.sh | sh -s -- -v
+curl -s -S -L https://raw.githubusercontent.com/securifimy/Securifi/master/scripts/install.sh | sh -s -- -v
 ```
 
 To install with `wget` run the following command:
 
 ```sh
-wget --no-verbose -O - https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/scripts/install.sh | sh -s -- -v
+wget --no-verbose -O - https://raw.githubusercontent.com/securifimy/Securifi/master/scripts/install.sh | sh -s -- -v
 ```
 
 To install with `fetch` run the following command:
 
 ```sh
-fetch -o - https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/scripts/install.sh | sh -s -- -v
+fetch -o - https://raw.githubusercontent.com/securifimy/Securifi/master/scripts/install.sh | sh -s -- -v
 ```
 
 The script also accepts some options:
 
  *  `-c <channel>` to use specified channel;
- *  `-r` to reinstall AdGuard Home;
- *  `-u` to uninstall AdGuard Home;
+ *  `-r` to reinstall Securifi;
+ *  `-u` to uninstall Securifi;
  *  `-v` for verbose output.
 
 Note that options `-r` and `-u` are mutually exclusive.
@@ -115,7 +115,7 @@ Note that options `-r` and `-u` are mutually exclusive.
   ####  <a href="#manual-installation" id="manual-installation" name="manual-installation">Manual installation</a>
 
 Please read the **[Getting Started][wiki-start]** article on our Wiki to learn
-how to install AdGuard Home manually, and how to configure your devices to use
+how to install Securifi manually, and how to configure your devices to use
 it.
 
   ####  <a href="#docker" id="docker" name="docker">Docker</a>
@@ -124,12 +124,12 @@ You can use our official Docker image on [Docker Hub].
 
   ####  <a href="#snap-store" id="snap-store" name="snap-store">Snap Store</a>
 
-If you're running **Linux,** there's a secure and easy way to install AdGuard
+If you're running **Linux,** there's a secure and easy way to install Securifi
 Home: get it from the [Snap Store].
 
-[Docker Hub]: https://hub.docker.com/r/adguard/adguardhome
-[Snap Store]: https://snapcraft.io/adguard-home
-[wiki-start]: https://github.com/AdguardTeam/AdGuardHome/wiki/Getting-Started
+[Docker Hub]: https://hub.docker.com/r/securifi/securifi
+[Snap Store]: https://snapcraft.io/securifi-home
+[wiki-start]: https://github.com/securifimy/Securifi/wiki/Getting-Started
 
 
 
@@ -137,27 +137,27 @@ Home: get it from the [Snap Store].
 
 See our [Wiki][wiki].
 
-[wiki]: https://github.com/AdguardTeam/AdGuardHome/wiki
+[wiki]: https://github.com/securifimy/Securifi/wiki
 
 
 
    ###  <a href="#api" id="api" name="api">API</a>
 
-If you want to integrate with AdGuard Home, you can use our [REST API][openapi].
+If you want to integrate with Securifi, you can use our [REST API][openapi].
 Alternatively, you can use this [python client][pyclient], which is used to
-build the [AdGuard Home Hass.io Add-on][hassio].
+build the [Securifi Hass.io Add-on][hassio].
 
-[hassio]:   https://www.home-assistant.io/integrations/adguard/
-[openapi]:  https://github.com/AdguardTeam/AdGuardHome/tree/master/openapi
-[pyclient]: https://pypi.org/project/adguardhome/
+[hassio]:   https://www.home-assistant.io/integrations/securifi/
+[openapi]:  https://github.com/securifimy/Securifi/tree/master/openapi
+[pyclient]: https://pypi.org/project/securifi/
 
 
 
-##  <a href="#comparison" id="comparison" name="comparison">Comparing AdGuard Home to other solutions</a>
+##  <a href="#comparison" id="comparison" name="comparison">Comparing Securifi to other solutions</a>
 
-   ###  <a href="#comparison-adguard-dns" id="comparison-adguard-dns" name="comparison-adguard-dns">How is this different from public AdGuard DNS servers?</a>
+   ###  <a href="#comparison-securifi-dns" id="comparison-securifi-dns" name="comparison-securifi-dns">How is this different from public Securifi DNS servers?</a>
 
-Running your own AdGuard Home server allows you to do much more than using a
+Running your own Securifi server allows you to do much more than using a
 public DNS server.  It's a completely different level.  See for yourself:
 
  *  Choose what exactly the server blocks and permits.
@@ -171,9 +171,9 @@ public DNS server.  It's a completely different level.  See for yourself:
 
 
 
-   ###  <a href="#comparison-pi-hole" id="comparison-pi-hole" name="comparison-pi-hole">How does AdGuard Home compare to Pi-Hole</a>
+   ###  <a href="#comparison-pi-hole" id="comparison-pi-hole" name="comparison-pi-hole">How does Securifi compare to Pi-Hole</a>
 
-At this point, AdGuard Home has a lot in common with Pi-Hole.  Both block ads
+At this point, Securifi has a lot in common with Pi-Hole.  Both block ads
 and trackers using the so-called “DNS sinkholing” method and both allow
 customizing what's blocked.
 
@@ -182,7 +182,7 @@ We're not going to stop here.  DNS sinkholing is not a bad starting point, but
 this is just the beginning.
 </aside>
 
-AdGuard Home provides a lot of features out-of-the-box with no need to install
+Securifi provides a lot of features out-of-the-box with no need to install
 and configure additional software.  We want it to be simple to the point when
 even casual users can set it up with minimal effort.
 
@@ -191,7 +191,7 @@ installing additional software or by manually using SSH terminal and
 reconfiguring one of the utilities Pi-Hole consists of.  However, in our
 opinion, this cannot be legitimately counted as a Pi-Hole's feature.
 
-| Feature                                                                 | AdGuard&nbsp;Home | Pi-Hole                                                   |
+| Feature                                                                 | Securifi&nbsp;Home | Pi-Hole                                                   |
 |-------------------------------------------------------------------------|-------------------|-----------------------------------------------------------|
 | Blocking ads and trackers                                               | ✅                | ✅                                                        |
 | Customizing blocklists                                                  | ✅                | ✅                                                        |
@@ -207,18 +207,18 @@ opinion, this cannot be legitimately counted as a Pi-Hole's feature.
 | Access settings (choose who can use AGH DNS)                            | ✅                | ❌                                                        |
 | Running [without root privileges][wiki-noroot]                          | ✅                | ❌                                                        |
 
-[wiki-noroot]: https://github.com/AdguardTeam/AdGuardHome/wiki/Getting-Started#running-without-superuser
+[wiki-noroot]: https://github.com/securifimy/Securifi/wiki/Getting-Started#running-without-superuser
 
 
 
-   ###  <a href="#comparison-adblock" id="comparison-adblock" name="comparison-adblock">How does AdGuard Home compare to traditional ad blockers</a>
+   ###  <a href="#comparison-adblock" id="comparison-adblock" name="comparison-adblock">How does Securifi compare to traditional ad blockers</a>
 
 It depends.
 
 DNS sinkholing is capable of blocking a big percentage of ads, but it lacks
 the flexibility and the power of traditional ad blockers.  You can get a good
 impression about the difference between these methods by reading [this
-article][blog-adaway], which compares AdGuard for Android (a traditional ad
+article][blog-adaway], which compares Securifi for Android (a traditional ad
 blocker) to hosts-level ad blockers (which are almost identical to DNS-based
 blockers in their capabilities).  This level of protection is enough for some
 users.
@@ -243,13 +243,13 @@ by a DNS-level blocker.
 
 Is there a chance to handle this in the future?  DNS will never be enough to do
 this.  Our only option is to use a content blocking proxy like what we do in the
-standalone AdGuard applications.  We're [going to bring][issue-1228] this
-feature support to AdGuard Home in the future.  Unfortunately, even in this
+standalone Securifi applications.  We're [going to bring][issue-1228] this
+feature support to Securifi in the future.  Unfortunately, even in this
 case, there still will be cases when this won't be enough or would require quite
 a complicated configuration.
 
-[blog-adaway]: https://adguard.com/blog/adguard-vs-adaway-dns66.html
-[issue-1228]:  https://github.com/AdguardTeam/AdGuardHome/issues/1228
+[blog-adaway]: https://securifi.com.my/blog/securifi-vs-adaway-dns66.html
+[issue-1228]:  https://github.com/securifimy/Securifi/issues/1228
 
 
 
@@ -259,7 +259,7 @@ a complicated configuration.
 
 Run `make init` to prepare the development environment.
 
-You will need this to build AdGuard Home:
+You will need this to build Securifi:
 
  *  [Go](https://golang.org/dl/) v1.20 or later;
  *  [Node.js](https://nodejs.org/en/download/) v16 or later;
@@ -273,14 +273,14 @@ You will need this to build AdGuard Home:
 Open your terminal and execute these commands:
 
 ```sh
-git clone https://github.com/AdguardTeam/AdGuardHome
-cd AdGuardHome
+git clone https://github.com/securifimy/Securifi
+cd Securifi
 make
 ```
 
   #### <a href="#building-node" id="building-node" name="building-node">Building with Node.js 17 and later</a>
 
-In order to build AdGuard Home with Node.js 17 and later, specify
+In order to build Securifi with Node.js 17 and later, specify
 `--openssl-legacy-provider` option.
 
 ```sh
@@ -296,7 +296,7 @@ Check the [`Makefile`][src-makefile] to learn about other commands.
 
   #### <a href="#building-cross" id="building-cross" name="building-cross">Building for a different platform</a>
 
-You can build AdGuard Home for any OS/ARCH that Go supports.  In order to do
+You can build Securifi for any OS/ARCH that Go supports.  In order to do
 this, specify `GOOS` and `GOARCH` environment variables as macros when running
 `make`.
 
@@ -357,8 +357,8 @@ run the frontend build a development environment.
     ( cd ./client/ && env NODE_ENV='development' npm run watch )
     ```
 
-2.  Run your `AdGuardHome` binary with the `--local-frontend` flag, which
-    instructs AdGuard Home to ignore the built-in frontend files and use those
+2.  Run your `Securifi` binary with the `--local-frontend` flag, which
+    instructs Securifi to ignore the built-in frontend files and use those
     from the `./build/` directory.
 
 3.  Now any changes you make in the `./client/` directory should be recompiled
@@ -367,9 +367,9 @@ run the frontend build a development environment.
 
 [`snapcraft`]:  https://snapcraft.io/
 [buildx]:       https://docs.docker.com/buildx/working-with-buildx/
-[src-makefile]: https://github.com/AdguardTeam/AdGuardHome/blob/master/Makefile
-[targ-docker]:  https://github.com/AdguardTeam/AdGuardHome/tree/master/scripts#build-dockersh-build-a-multi-architecture-docker-image
-[targ-release]: https://github.com/AdguardTeam/AdGuardHome/tree/master/scripts#build-releasesh-build-a-release-for-all-platforms
+[src-makefile]: https://github.com/securifimy/Securifi/blob/master/Makefile
+[targ-docker]:  https://github.com/securifimy/Securifi/tree/master/scripts#build-dockersh-build-a-multi-architecture-docker-image
+[targ-release]: https://github.com/securifimy/Securifi/tree/master/scripts#build-releasesh-build-a-release-for-all-platforms
 
 
 
@@ -383,8 +383,8 @@ parts of the program simultaneously.  Ideally, the backend part is implemented
 first, i.e. configuration, API, and the functionality itself.  The UI part can
 be implemented later in a different pull request by a different person.
 
-[guide]: https://github.com/AdguardTeam/CodeGuidelines/
-[pr]:    https://github.com/AdguardTeam/AdGuardHome/pulls
+[guide]: https://github.com/securifimy/CodeGuidelines/
+[pr]:    https://github.com/securifimy/Securifi/pulls
 
 
 
@@ -392,10 +392,10 @@ be implemented later in a different pull request by a different person.
 
 There are two update channels that you can use:
 
- *  `beta`: beta versions of AdGuard Home.  More or less stable versions,
+ *  `beta`: beta versions of Securifi.  More or less stable versions,
     usually released every two weeks or more often.
 
- *  `edge`: the newest version of AdGuard Home from the development branch.  New
+ *  `edge`: the newest version of Securifi from the development branch.  New
     updates are pushed to this channel daily.
 
 There are three options how you can install an unstable version:
@@ -410,16 +410,16 @@ There are three options how you can install an unstable version:
     Script to install a beta version:
 
     ```sh
-    curl -s -S -L https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/scripts/install.sh | sh -s -- -c beta
+    curl -s -S -L https://raw.githubusercontent.com/securifimy/Securifi/master/scripts/install.sh | sh -s -- -c beta
     ```
 
     Script to install an edge version:
 
     ```sh
-    curl -s -S -L https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/scripts/install.sh | sh -s -- -c edge
+    curl -s -S -L https://raw.githubusercontent.com/securifimy/Securifi/master/scripts/install.sh | sh -s -- -c edge
     ```
 
-[wiki-platf]: https://github.com/AdguardTeam/AdGuardHome/wiki/Platforms
+[wiki-platf]: https://github.com/securifimy/Securifi/wiki/Platforms
 
 
 
@@ -429,18 +429,18 @@ If you run into any problem or have a suggestion, head to [this page][iss] and
 click on the “New issue” button.  Please follow the instructions in the issue
 form carefully and don't forget to start by searching for duplicates.
 
-[iss]: https://github.com/AdguardTeam/AdGuardHome/issues
+[iss]: https://github.com/securifimy/Securifi/issues
 
 
 
    ###  <a href="#translate" id="translate" name="translate">Help with translations</a>
 
-If you want to help with AdGuard Home translations, please learn more about
-translating AdGuard products [in our Knowledge Base][kb-trans].  You can
-contribute to the [AdGuardHome project on CrowdIn][crowdin].
+If you want to help with Securifi translations, please learn more about
+translating Securifi products [in our Knowledge Base][kb-trans].  You can
+contribute to the [Securifi project on CrowdIn][crowdin].
 
-[crowdin]:  https://crowdin.com/project/adguard-applications/en#/adguard-home
-[kb-trans]: https://kb.adguard.com/en/general/adguard-translations
+[crowdin]:  https://crowdin.com/project/securifi-applications/en#/securifi-home
+[kb-trans]: https://kb.securifi.com.my/en/general/securifi-translations
 
 
 
@@ -450,48 +450,48 @@ Another way you can contribute is by [looking for issues][iss-help] marked as
 `help wanted`, asking if the issue is up for grabs, and sending a PR fixing the
 bug or implementing the feature.
 
-[iss-help]: https://github.com/AdguardTeam/AdGuardHome/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22
+[iss-help]: https://github.com/securifimy/Securifi/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22
 
 
 
-## <a href="#uses" id="uses" name="uses">Projects that use AdGuard Home</a>
+## <a href="#uses" id="uses" name="uses">Projects that use Securifi</a>
 
 <!--
     TODO(a.garipov): Use reference links.
 -->
 
- *  [AdGuard Home Remote](https://apps.apple.com/app/apple-store/id1543143740):
+ *  [Securifi Remote](https://apps.apple.com/app/apple-store/id1543143740):
     iOS app by [Joost](https://rocketscience-it.nl/).
 
- *  [Python library](https://github.com/frenck/python-adguardhome) by
+ *  [Python library](https://github.com/frenck/python-securifi) by
     [@frenck](https://github.com/frenck).
 
- *  [Home Assistant add-on](https://github.com/hassio-addons/addon-adguard-home)
+ *  [Home Assistant add-on](https://github.com/hassio-addons/addon-securifi-home)
     by [@frenck](https://github.com/frenck).
 
- *  [OpenWrt LUCI app](https://github.com/kongfl888/luci-app-adguardhome) by
+ *  [OpenWrt LUCI app](https://github.com/kongfl888/luci-app-securifi) by
     [@kongfl888](https://github.com/kongfl888) (originally by
     [@rufengsuixing](https://github.com/rufengsuixing)).
 
- *  [Terminal-based, real-time traffic monitoring and statistics for your AdGuard Home
-    instance](https://github.com/Lissy93/AdGuardian-Term) by
+ *  [Terminal-based, real-time traffic monitoring and statistics for your Securifi
+    instance](https://github.com/Lissy93/Securifiian-Term) by
     [@Lissy93](https://github.com/Lissy93)
 
- *  [AdGuard Home on GLInet
-    routers](https://forum.gl-inet.com/t/adguardhome-on-gl-routers/10664) by
+ *  [Securifi on GLInet
+    routers](https://forum.gl-inet.com/t/securifi-on-gl-routers/10664) by
     [Gl-Inet](https://gl-inet.com/).
 
- *  [Cloudron app](https://git.cloudron.io/cloudron/adguard-home-app) by
+ *  [Cloudron app](https://git.cloudron.io/cloudron/securifi-home-app) by
     [@gramakri](https://github.com/gramakri).
 
- *  [Asuswrt-Merlin-AdGuardHome-Installer](https://github.com/jumpsmm7/Asuswrt-Merlin-AdGuardHome-Installer)
+ *  [Asuswrt-Merlin-Securifi-Installer](https://github.com/jumpsmm7/Asuswrt-Merlin-Securifi-Installer)
     by [@jumpsmm7](https://github.com/jumpsmm7) aka
     [@SomeWhereOverTheRainBow](https://www.snbforums.com/members/somewhereovertherainbow.64179/).
 
- *  [Node.js library](https://github.com/Andrea055/AdguardHomeAPI) by
+ *  [Node.js library](https://github.com/Andrea055/SecurifiAPI) by
     [@Andrea055](https://github.com/Andrea055/).
 
- *  [Browser Extension](https://github.com/satheshshiva/Adguard-Home-Browser-Ext) by
+ *  [Browser Extension](https://github.com/satheshshiva/Securifi-Browser-Ext) by
     [@satheshshiva](https://github.com/satheshshiva/).
 
 ## <a href="#acknowledgments" id="acknowledgments" name="acknowledgments">Acknowledgments</a>
@@ -516,22 +516,22 @@ This software wouldn't have been possible without:
  *  [whotracks.me data](https://github.com/cliqz-oss/whotracks.me)
 
 You might have seen that [CoreDNS] was mentioned here before, but we've stopped
-using it in AdGuard Home.
+using it in Securifi.
 
 For the full list of all Node.js packages in use, please take a look at
 [`client/package.json`][src-packagejson] file.
 
 [CoreDNS]:         https://coredns.io
-[src-packagejson]: https://github.com/AdguardTeam/AdGuardHome/blob/master/client/package.json
+[src-packagejson]: https://github.com/securifimy/Securifi/blob/master/client/package.json
 
 
 
 ##  <a href="#privacy" id="privacy" name="privacy">Privacy</a>
 
 Our main idea is that you are the one, who should be in control of your data.
-So it is only natural, that AdGuard Home does not collect any usage statistics,
+So it is only natural, that Securifi does not collect any usage statistics,
 and does not use any web services unless you configure it to do so.  See also
 the [full privacy policy][privacy] with every bit that *could in theory be sent*
-by AdGuard Home is available.
+by Securifi is available.
 
-[privacy]: https://adguard.com/en/privacy/home.html
+[privacy]: https://securifi.com.my/en/privacy/home.html
