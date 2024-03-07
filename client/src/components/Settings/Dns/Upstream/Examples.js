@@ -125,7 +125,7 @@ const Examples = (props) => (
                 <code>[/example.local/]94.140.14.140</code>: <Trans
                     components={[
                         <a
-                            href="https://github.com/AdguardTeam/AdGuardHome/wiki/Configuration#upstreams-for-domains"
+                            href="https://github.com/securifimy/Securifi/wiki/Configuration#upstreams-for-domains"
                             target="_blank"
                             rel="noopener noreferrer"
                             key="0"
@@ -141,7 +141,7 @@ const Examples = (props) => (
                 <code>[/example.local/]94.140.14.140 2a10:50c0::1:ff</code>: <Trans
                     components={[
                         <a
-                            href="https://github.com/AdguardTeam/AdGuardHome/wiki/Configuration#upstreams-for-domains"
+                            href="https://github.com/securifimy/Securifi/wiki/Configuration#upstreams-for-domains"
                             target="_blank"
                             rel="noopener noreferrer"
                             key="0"

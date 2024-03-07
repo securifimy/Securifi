@@ -241,7 +241,7 @@ const getTabs = ({
                         <Trans
                             components={[
                                 <a
-                                    href="https://github.com/AdguardTeam/AdguardHome/wiki/Encryption"
+                                    href="https://github.com/securifimy/Securifi/wiki/Encryption"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     key="0"

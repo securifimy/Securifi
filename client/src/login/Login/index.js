@@ -53,7 +53,7 @@ class Login extends Component {
                                 <Trans
                                     components={[
                                         <a
-                                            href="https://github.com/AdguardTeam/AdGuardHome/wiki/Configuration#password-reset"
+                                            href="https://github.com/securifimy/Securifi/wiki/Configuration#password-reset"
                                             key="0"
                                             target="_blank"
                                             rel="noopener noreferrer"
