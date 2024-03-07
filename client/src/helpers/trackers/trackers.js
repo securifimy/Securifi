@@ -64,7 +64,7 @@ export const getSourceData = (trackerData) => {
 };
 
 /**
- * Converts the JSON string source into numeric source for AdGuard Home
+ * Converts the JSON string source into numeric source for Securifi
  *
  * @param {TrackerData} trackerData tracker data
  * @returns {number} source number
