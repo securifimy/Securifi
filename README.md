@@ -13,9 +13,9 @@
 <p align="center">
     <a href="https://securifi.com.my/">securifi.com.my</a> |
     <a href="https://github.com/securifimy/Securifi/wiki">Wiki</a> |
-    <a href="https://reddit.com/r/Securifi">Reddit</a> |
-    <a href="https://twitter.com/Securifi">Twitter</a> |
-    <a href="https://t.me/securifi_en">Telegram</a>
+    <!-- <a href="https://reddit.com/r/Securifi">Reddit</a> |  -->
+    <!-- <a href="https://twitter.com/Securifi">Twitter</a> |
+    <a href="https://t.me/securifi_en">Telegram</a> -->
     <br/><br/>
     <a href="https://codecov.io/github/securifimy/Securifi?branch=master">
       <img src="https://img.shields.io/codecov/c/github/securifimy/Securifi/master.svg" alt="Code Coverage"/>
@@ -23,16 +23,16 @@
     <a href="https://goreportcard.com/report/securifimy/Securifi">
       <img src="https://goreportcard.com/badge/github.com/securifimy/Securifi" alt="Go Report Card"/>
     </a>
-    <a href="https://hub.docker.com/r/securifi/securifi">
-        <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/securifi/securifi.svg?maxAge=604800"/>
+    <a href="https://hub.docker.com/r/securifimy/securifi">
+        <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/securifimy/securifi.svg?maxAge=604800"/>
     </a>
     <br/>
     <a href="https://github.com/securifimy/Securifi/releases">
         <img src="https://img.shields.io/github/release/securifimy/Securifi/all.svg" alt="Latest release"/>
     </a>
-    <a href="https://snapcraft.io/securifi-home">
+<!--     <a href="https://snapcraft.io/securifi-home">
         <img alt="securifi-home" src="https://snapcraft.io/securifi-home/badge.svg"/>
-    </a>
+    </a> -->
 </p>
 <br/>
 <p align="center">
